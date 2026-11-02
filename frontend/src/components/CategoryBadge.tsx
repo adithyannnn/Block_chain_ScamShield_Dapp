@@ -43,3 +43,4 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ categoryId, showIc
     </span>
   );
 };
+

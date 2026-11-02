@@ -56,3 +56,4 @@ Open [http://localhost:3000](http://localhost:3000) in Chrome with MetaMask inst
 5. **Check URL**: Navigate to **Check URL**, enter `https://evil-phishing-bank.com/login`, click **Check Fingerprint**, and capture `05-check-reported-url.png`.
 6. **Check Unreported URL**: Enter `https://innocent-fresh-domain.org/about`, verify `NO REPORT FOUND`, and capture `06-check-clean-url.png`.
 7. **Threat Reports & My Reports**: Navigate to respective tabs to capture `07-my-reports.png` and `08-threat-reports.png`.
+

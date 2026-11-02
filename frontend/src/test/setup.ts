@@ -6,3 +6,4 @@ if (!globalThis.crypto || !globalThis.crypto.subtle) {
   // @ts-ignore
   globalThis.crypto = webcrypto;
 }
+

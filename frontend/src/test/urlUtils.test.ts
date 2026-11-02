@@ -166,3 +166,4 @@ describe('Formatting Helpers and Category Constants', () => {
     expect(THREAT_CATEGORIES[5].name).toBe('Brand Impersonation');
   });
 });
+

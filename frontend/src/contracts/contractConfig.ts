@@ -33,7 +33,7 @@ export const SUPPORTED_NETWORKS: Record<number, NetworkConfig> = {
     chainHex: '0x7a69',
     name: 'Hardhat Localhost',
     rpcUrls: ['http://127.0.0.1:8545'],
-    blockExplorerUrls: [''],
+    blockExplorerUrls: [],
     nativeCurrency: {
       name: 'Local Testnet ETH',
       symbol: 'ETH',
@@ -54,7 +54,7 @@ export const CONTRACT_CONFIG = {
   address: (import.meta.env.VITE_CONTRACT_ADDRESS as string) || (contractData.address as string) || '',
   abi: contractData.abi,
   network: contractData.network,
-  chainId: contractData.chainId,
+  chainId: Number(contractData.chainId) || LOCAL_CHAIN_ID,
   transactionHash: contractData.transactionHash,
 };
 
@@ -75,3 +75,4 @@ export function getExplorerAddressUrl(address: string, chainId: number = TARGET_
   }
   return `https://sepolia.etherscan.io/address/${address}`;
 }
+

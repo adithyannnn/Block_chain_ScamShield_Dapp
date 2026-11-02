@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
-import { SUPPORTED_NETWORKS, TARGET_CHAIN_ID, LOCAL_CHAIN_ID, NetworkConfig } from '../contracts/contractConfig';
+import { SUPPORTED_NETWORKS, CONTRACT_CONFIG, NetworkConfig } from '../contracts/contractConfig';
 
 export interface MetaMaskState {
   account: string | null;
@@ -21,8 +21,8 @@ export function useMetaMask() {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
 
-  // Check if current chain is either Sepolia or Localhost
-  const isCorrectNetwork = chainId === TARGET_CHAIN_ID || chainId === LOCAL_CHAIN_ID;
+  // Network is correct if connected wallet's chain matches the network where contract is actually deployed
+  const isCorrectNetwork = chainId === CONTRACT_CONFIG.chainId;
 
   // Initialize or re-sync provider
   const syncWallet = useCallback(async () => {
@@ -130,7 +130,7 @@ export function useMetaMask() {
     setError(null);
   };
 
-  const switchNetwork = async (targetChain: number = TARGET_CHAIN_ID) => {
+  const switchNetwork = async (targetChain: number = CONTRACT_CONFIG.chainId) => {
     if (typeof window === 'undefined' || !(window as any).ethereum) {
       setError('MetaMask is not available.');
       return;
@@ -152,17 +152,18 @@ export function useMetaMask() {
       // Error 4902: Target network has not been added to MetaMask
       if (switchError.code === 4902) {
         try {
+          const addParams: any = {
+            chainId: networkConfig.chainHex,
+            chainName: networkConfig.name,
+            rpcUrls: networkConfig.rpcUrls,
+            nativeCurrency: networkConfig.nativeCurrency,
+          };
+          if (networkConfig.blockExplorerUrls && networkConfig.blockExplorerUrls.length > 0 && networkConfig.blockExplorerUrls[0]) {
+            addParams.blockExplorerUrls = networkConfig.blockExplorerUrls;
+          }
           await (window as any).ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: networkConfig.chainHex,
-                chainName: networkConfig.name,
-                rpcUrls: networkConfig.rpcUrls,
-                blockExplorerUrls: networkConfig.blockExplorerUrls,
-                nativeCurrency: networkConfig.nativeCurrency,
-              },
-            ],
+            params: [addParams],
           });
           setError(null);
         } catch (addError: any) {
@@ -190,3 +191,4 @@ export function useMetaMask() {
     switchNetwork,
   };
 }
+

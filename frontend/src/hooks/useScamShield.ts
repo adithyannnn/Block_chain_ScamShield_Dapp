@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
-import { CONTRACT_CONFIG, SUPPORTED_NETWORKS, TARGET_CHAIN_ID } from '../contracts/contractConfig';
+import { CONTRACT_CONFIG, SUPPORTED_NETWORKS } from '../contracts/contractConfig';
 
 export interface ContractReport {
   urlHash: string;
@@ -28,13 +28,18 @@ export function useScamShield(
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [contractError, setContractError] = useState<string | null>(null);
 
-  // Read-only fallback provider when MetaMask is disconnected
+  // Read-only provider connected to the network where the contract is actually deployed
   const readProvider = useMemo(() => {
-    if (provider) return provider;
-    // Fallback to public Sepolia RPC or localhost
-    const rpcUrl = SUPPORTED_NETWORKS[TARGET_CHAIN_ID]?.rpcUrls[0] || 'https://ethereum-sepolia.publicnode.com';
-    return new ethers.JsonRpcProvider(rpcUrl);
-  }, [provider]);
+    // If the browser provider is connected to the exact network where contract is deployed, use it
+    if (provider && _chainId === CONTRACT_CONFIG.chainId) {
+      return provider;
+    }
+    // Otherwise, query the RPC endpoint of the network where the contract is actually hosted
+    const deployedRpc =
+      SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.rpcUrls[0] ||
+      (CONTRACT_CONFIG.chainId === 31337 ? 'http://127.0.0.1:8545' : 'https://ethereum-sepolia.publicnode.com');
+    return new ethers.JsonRpcProvider(deployedRpc);
+  }, [provider, _chainId]);
 
   // Read-only contract instance
   const readContract = useMemo(() => {
@@ -114,6 +119,26 @@ export function useScamShield(
       setContractError(null);
 
       try {
+        // Enforce network alignment: do not allow transaction if wallet is on wrong chain
+        if (_chainId !== CONTRACT_CONFIG.chainId) {
+          const currentNetName = SUPPORTED_NETWORKS[_chainId || 0]?.name || `Chain ID ${_chainId}`;
+          const targetNetName = SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || `Chain ID ${CONTRACT_CONFIG.chainId}`;
+          throw new Error(
+            `Network Mismatch: Your MetaMask is connected to ${currentNetName}, but the contract is deployed on ${targetNetName}. ` +
+            `Please switch your MetaMask network to ${targetNetName} before signing.`
+          );
+        }
+
+        // Pre-flight check: Verify that contract bytecode actually exists on the wallet's chain
+        const signerCode = await signer.provider.getCode(CONTRACT_CONFIG.address);
+        if (!signerCode || signerCode === '0x') {
+          const targetNetName = SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || `Chain ID ${CONTRACT_CONFIG.chainId}`;
+          throw new Error(
+            `No contract bytecode found at ${CONTRACT_CONFIG.address}. ` +
+            `Please ensure you are connected to ${targetNetName} where the contract was deployed.`
+          );
+        }
+
         // Step 1: Pre-check whether it currently exists
         const alreadyExists = await readContract?.checkURL(urlHash).catch(() => false);
 

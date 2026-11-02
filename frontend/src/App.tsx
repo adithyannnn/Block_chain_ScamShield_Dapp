@@ -9,7 +9,7 @@ import { About } from './pages/About';
 import { ReportDetailsModal } from './components/ReportDetailsModal';
 import { useMetaMask } from './hooks/useMetaMask';
 import { useScamShield, ContractReport, DashboardStats } from './hooks/useScamShield';
-import { TARGET_CHAIN_ID } from './contracts/contractConfig';
+import { CONTRACT_CONFIG, SUPPORTED_NETWORKS } from './contracts/contractConfig';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -59,18 +59,18 @@ export const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
       {/* Wrong Network Warning Banner */}
       {metaMask.isConnected && !metaMask.isCorrectNetwork && (
-        <div className="bg-amber-500/20 border-b border-amber-500/30 px-4 py-2 text-xs text-amber-200 flex items-center justify-between">
+        <div className="bg-amber-500/20 border-b border-amber-500/30 px-4 py-2.5 text-xs text-amber-200 flex items-center justify-between">
           <div className="flex items-center space-x-2 max-w-3xl">
             <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
             <span>
-              You are connected to an unsupported network (Chain ID: {metaMask.chainId}). Please switch to Ethereum Sepolia Testnet (Chain ID: {TARGET_CHAIN_ID}) to sign transactions.
+              Network Mismatch: Connected to <strong>{SUPPORTED_NETWORKS[metaMask.chainId || 0]?.name || `Chain ID ${metaMask.chainId}`}</strong>, but the contract is deployed on <strong>{SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || `Chain ID ${CONTRACT_CONFIG.chainId}`}</strong>.
             </span>
           </div>
           <button
-            onClick={() => metaMask.switchNetwork(TARGET_CHAIN_ID)}
-            className="px-3 py-1 rounded bg-amber-500 hover:bg-amber-400 text-navy-950 font-bold text-xs transition-colors ml-4 flex-shrink-0"
+            onClick={() => metaMask.switchNetwork(CONTRACT_CONFIG.chainId)}
+            className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-navy-950 font-bold text-xs transition-colors ml-4 flex-shrink-0 shadow-sm"
           >
-            Switch Network
+            Switch to {SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || `Chain ${CONTRACT_CONFIG.chainId}`}
           </button>
         </div>
       )}

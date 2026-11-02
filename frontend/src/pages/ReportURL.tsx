@@ -14,7 +14,7 @@ import {
 import { normalizeURL, computeSHA256Bytes32, THREAT_CATEGORIES, formatTimestamp } from '../lib/urlUtils';
 import { useScamShield, ContractReport } from '../hooks/useScamShield';
 import { CategoryBadge } from '../components/CategoryBadge';
-import { getExplorerTxUrl } from '../contracts/contractConfig';
+import { getExplorerTxUrl, CONTRACT_CONFIG, SUPPORTED_NETWORKS } from '../contracts/contractConfig';
 
 interface ReportURLProps {
   scamShield: ReturnType<typeof useScamShield>;
@@ -331,7 +331,7 @@ export const ReportURL: React.FC<ReportURLProps> = ({
                 className="w-full py-3.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-semibold text-sm transition-all flex items-center justify-center space-x-2"
               >
                 <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <span>Switch to Sepolia Network (Chain ID 11155111)</span>
+                <span>Switch to {SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || 'Localhost'} (Chain ID {CONTRACT_CONFIG.chainId})</span>
               </button>
             ) : (
               <button

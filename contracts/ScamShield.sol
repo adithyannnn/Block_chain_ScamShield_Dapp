@@ -272,3 +272,4 @@ contract ScamShield {
         }
     }
 }
+

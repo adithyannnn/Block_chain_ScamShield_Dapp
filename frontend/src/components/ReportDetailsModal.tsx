@@ -180,3 +180,4 @@ export const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
     </div>
   );
 };
+

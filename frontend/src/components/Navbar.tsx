@@ -9,7 +9,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { formatAddress } from '../lib/urlUtils';
-import { SUPPORTED_NETWORKS, TARGET_CHAIN_ID } from '../contracts/contractConfig';
+import { SUPPORTED_NETWORKS, CONTRACT_CONFIG } from '../contracts/contractConfig';
 
 export type NavigationPage = 'dashboard' | 'report' | 'check' | 'reports' | 'my-reports' | 'about';
 
@@ -115,12 +115,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 ) : (
                   <button
-                    onClick={() => onSwitchNetwork(TARGET_CHAIN_ID)}
+                    onClick={() => onSwitchNetwork(CONTRACT_CONFIG.chainId)}
                     className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs font-medium text-amber-300 hover:bg-amber-500/20 transition-colors"
-                    title="Click to switch to Ethereum Sepolia"
+                    title={`Click to switch to ${SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || 'deployed network'}`}
                   >
-                    <RefreshCw className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-                    <span>Switch to Sepolia</span>
+                    <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Switch to {SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || 'Localhost'}</span>
                   </button>
                 )}
               </div>
@@ -234,12 +234,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {!isCorrectNetwork && (
                   <button
                     onClick={() => {
-                      onSwitchNetwork(TARGET_CHAIN_ID);
+                      onSwitchNetwork(CONTRACT_CONFIG.chainId);
                       setMobileMenuOpen(false);
                     }}
                     className="w-full py-2 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-medium"
                   >
-                    Switch to Sepolia Network
+                    Switch to {SUPPORTED_NETWORKS[CONTRACT_CONFIG.chainId]?.name || 'Contract Network'}
                   </button>
                 )}
                 <button
