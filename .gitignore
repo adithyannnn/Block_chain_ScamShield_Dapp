@@ -1,0 +1,30 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment secrets
+.env
+.env.local
+.env.*.local
+.appdata/
+
+# Hardhat build artifacts
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+
+# Frontend build outputs
+frontend/dist/
+frontend/node_modules/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
